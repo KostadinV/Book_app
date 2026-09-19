@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:my_aplication/database/db_helper.dart';
 import 'package:my_aplication/widgets/rating_bar_widget.dart';
+import 'package:my_aplication/models/book.dart';
 
 class AddBookScreen extends StatefulWidget {
-  const AddBookScreen({super.key, this.book});
+  final Book? book;
 
-  final Map<String, dynamic>? book;
+  const AddBookScreen({super.key, this.book});
 
   @override
   State<AddBookScreen> createState() => _AddBookScreenState();
@@ -23,10 +24,17 @@ class _AddBookScreenState extends State<AddBookScreen> {
     super.initState();
     // If we passed a book to edit, pre-fill the form fields
     if (widget.book != null) {
-      _titleController.text = widget.book!['title'];
-      _authorController.text = widget.book!['author'];
-      _rating = (widget.book!['rating'] as num).toDouble();
+      _titleController.text = widget.book!.title;
+      _authorController.text = widget.book!.author;
+      _rating = widget.book!.rating;
     }
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _authorController.dispose();
+    super.dispose();
   }
 
   // Save book function triggered on button press
@@ -37,23 +45,24 @@ class _AddBookScreenState extends State<AddBookScreen> {
     if (enteredTitle.isEmpty || enteredAuthor.isEmpty) return;
 
     if (widget.book == null) {
-      await DatabaseHelper.insertBook(enteredTitle, enteredAuthor, _rating);
+      final newBook = Book(
+        title: enteredTitle,
+        author: enteredAuthor,
+        rating: _rating,
+      );
+      await DatabaseHelper.instance.insertBook(newBook);
     } else {
       // 2. Store values directly into SQLite database
-      await DatabaseHelper.updateBook(
-        widget.book!['id'],
-        enteredTitle,
-        enteredAuthor,
-        _rating,
+      final updateBook = Book(
+        id: widget.book!.id,
+        title: enteredTitle,
+        author: enteredAuthor,
+        rating: _rating,
       );
+      await DatabaseHelper.instance.updateBook(updateBook);
     }
-
-    // Clear input fields after saving
-    _titleController.clear();
-    _authorController.clear();
-
     if (mounted) {
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     }
   }
 
