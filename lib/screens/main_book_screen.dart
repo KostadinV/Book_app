@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_aplication/database/db_helper.dart';
 import 'package:my_aplication/screens/add_book_screen.dart';
+import '../models/book.dart';
 
 class MainBookScreen extends StatefulWidget {
   const MainBookScreen({super.key});
@@ -10,7 +11,8 @@ class MainBookScreen extends StatefulWidget {
 }
 
 class _MainBookScreenState extends State<MainBookScreen> {
-  List<Map<String, dynamic>> _myBooks = [];
+  List<Book> _books = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -18,22 +20,33 @@ class _MainBookScreenState extends State<MainBookScreen> {
     _refreshBooks();
   }
 
-  void _refreshBooks() async {
-    final data = await DatabaseHelper.getBooks();
+  // 2. Извличаме книгите от базата данни като List<Book>
+  Future<void> _refreshBooks() async {
+    setState(() => _isLoading = true);
+    final data = await DatabaseHelper.instance.getBooks();
     setState(() {
-      _myBooks = data;
+      _books = data;
+      _isLoading = false;
     });
   }
 
   // Open AddBookScreen, and refresh the list when user returns
   void _openAddBookScreen() async {
     // 1. Wait for user to finish on AddBookScreen
-    await Navigator.push(
+    final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const AddBookScreen()),
     );
+    if (result == true) {
+      _refreshBooks();
+    }
+  }
 
-    // 2. Refresh the list from the database after returning!
+  // Метод за изтриване на книга директно от списъка
+  Future<void> _deleteBook(int id) async {
+    // 1. Изтриваме книгата от базата данни
+    await DatabaseHelper.instance.deleteBook(id);
+    // 3. Опресняваме списъка на екрана
     _refreshBooks();
   }
 
@@ -41,23 +54,25 @@ class _MainBookScreenState extends State<MainBookScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('My book diary'),
+        title: Text('Моите прочетени книги'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: _myBooks.isEmpty
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _books.isEmpty
           ? const Center(child: Text('No books saved in database yet.'))
           : ListView.builder(
-              itemCount: _myBooks.length,
+              itemCount: _books.length,
               itemBuilder: (context, index) {
-                final book = _myBooks[index];
+                final book = _books[index];
                 return ListTile(
-                  title: Text(book['title']),
-                  subtitle: Text('By ${book['author']}'),
+                  title: Text(book.title),
+                  subtitle: Text('By ${book.author}'),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        '${book['rating']} ★',
+                        '${book.rating} ★',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.orange,
@@ -81,13 +96,7 @@ class _MainBookScreenState extends State<MainBookScreen> {
                       const SizedBox(width: 8),
                       IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () async {
-                          // 1. Delete from SQLite database using the book's ID
-                          await DatabaseHelper.deleteBook(book['id']);
-
-                          // 2. Refresh the list to remove it from the screen
-                          _refreshBooks();
-                        },
+                        onPressed: () => _deleteBook(book.id!),
                       ),
                     ],
                   ),

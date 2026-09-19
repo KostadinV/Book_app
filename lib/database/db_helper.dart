@@ -1,79 +1,67 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import '../models/book.dart';
 
 class DatabaseHelper {
+  static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _db;
 
+  DatabaseHelper._init();
+
   // 1. Get database instance (or open it if it doesn't exist yet)
-  static Future<Database> get database async {
+  Future<Database> get database async {
     if (_db != null) return _db!;
-    _db = await _initDatabase();
+    _db = await _initDatabase('books.db');
     return _db!;
   }
 
-  static Future<Database> _initDatabase() async {
+  Future<Database> _initDatabase(String filePath) async {
     String dbPath = await getDatabasesPath();
-    String path = join(dbPath, 'book_app.db');
+    String path = join(dbPath, filePath);
 
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: (db, version) {
-        return db.execute('''
-          CREATE TABLE books(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT,
-            author TEXT,
-            rating REAL
-          )
-        ''');
-      },
-    );
+    return await openDatabase(path, version: 1, onCreate: _createDB);
   }
 
-  // 3. Insert a new book entry into the table
-  static Future<int> insertBook(
-    String title,
-    String author,
-    double rating,
-  ) async {
-    final db = await database;
-    return await db.insert('books', {
-      'title': title,
-      'author': author,
-      'rating': rating,
-    });
+  Future<void> _createDB(Database db, int version) async {
+    await db.execute('''
+      CREATE TABLE books (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        author TEXT NOT NULL,
+        rating REAL NOT NULL
+      )
+    ''');
   }
 
-  static Future<int> deleteBook(int id) async {
-    final db = await database;
-    return await db.delete(
-      'books',
-      where: 'id = ?',
-      whereArgs: [id], // Uses the book's unique ID to target the exact row
-    );
+  // CREATE: Приема Book обект
+  Future<int> insertBook(Book book) async {
+    final db = await instance.database;
+    return await db.insert('books', book.toMap());
   }
 
-  // In db_helper.dart
+  // READ: Връща List<Book> вместо List<Map>
+  Future<List<Book>> getBooks() async {
+    final db = await instance.database;
+    final result = await db.query('books', orderBy: 'id DESC');
 
-  static Future<int> updateBook(
-    int id,
-    String title,
-    String author,
-    double rating,
-  ) async {
-    final db = await database;
+    // Превръщаме всеки Map от базата в Book обект
+    return result.map((json) => Book.fromMap(json)).toList();
+  }
+
+  // UPDATE: Приема Book обект
+  Future<int> updateBook(Book book) async {
+    final db = await instance.database;
     return await db.update(
       'books',
-      {'title': title, 'author': author, 'rating': rating},
+      book.toMap(),
       where: 'id = ?',
-      whereArgs: [id], // Targets the specific book ID
+      whereArgs: [book.id],
     );
   }
 
-  // 4. Fetch all books from the table
-  static Future<List<Map<String, dynamic>>> getBooks() async {
-    final db = await database;
-    return await db.query('books');
+  // DELETE: Изтрива по id
+  Future<int> deleteBook(int id) async {
+    final db = await instance.database;
+    return await db.delete('books', where: 'id = ?', whereArgs: [id]);
   }
 }
