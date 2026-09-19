@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:my_aplication/db_helper.dart';
-import 'package:my_aplication/rating_bar_widget.dart';
+import 'package:my_aplication/database/db_helper.dart';
+import 'package:my_aplication/widgets/rating_bar_widget.dart';
 
 class AddBookScreen extends StatefulWidget {
   const AddBookScreen({super.key, this.book});
