@@ -1,0 +1,123 @@
+import 'package:flutter/material.dart';
+import 'package:my_aplication/db_helper.dart';
+import 'package:my_aplication/rating_bar_widget.dart';
+
+class AddBookScreen extends StatefulWidget {
+  const AddBookScreen({super.key, this.book});
+
+  final Map<String, dynamic>? book;
+
+  @override
+  State<AddBookScreen> createState() => _AddBookScreenState();
+}
+
+class _AddBookScreenState extends State<AddBookScreen> {
+  final _titleController = TextEditingController();
+
+  final _authorController = TextEditingController();
+
+  double _rating = 3.0;
+
+  @override
+  void initState() {
+    super.initState();
+    // If we passed a book to edit, pre-fill the form fields
+    if (widget.book != null) {
+      _titleController.text = widget.book!['title'];
+      _authorController.text = widget.book!['author'];
+      _rating = (widget.book!['rating'] as num).toDouble();
+    }
+  }
+
+  // Save book function triggered on button press
+  void _saveBook() async {
+    String enteredTitle = _titleController.text;
+    String enteredAuthor = _authorController.text;
+
+    if (enteredTitle.isEmpty || enteredAuthor.isEmpty) return;
+
+    if (widget.book == null) {
+      await DatabaseHelper.insertBook(enteredTitle, enteredAuthor, _rating);
+    } else {
+      // 2. Store values directly into SQLite database
+      await DatabaseHelper.updateBook(
+        widget.book!['id'],
+        enteredTitle,
+        enteredAuthor,
+        _rating,
+      );
+    }
+
+    // Clear input fields after saving
+    _titleController.clear();
+    _authorController.clear();
+
+    if (mounted) {
+      Navigator.pop(context);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isEditing = widget.book != null;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(isEditing ? 'Edit book' : 'Add book'),
+        actionsIconTheme: IconThemeData(
+          color: Theme.of(context).colorScheme.primary,
+        ),
+        actions: [IconButton(onPressed: _saveBook, icon: Icon(Icons.save))],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              controller: _titleController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Book title',
+              ),
+              onTapOutside: (event) {
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: _authorController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Book Author',
+              ),
+              onTapOutside: (event) {
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                StarRatingBar(
+                  onRatingChanged: (newRating) {
+                    setState(() {
+                      _rating = newRating;
+                    });
+                  },
+                ),
+              ],
+            ),
+            ElevatedButton(
+              child: Text(isEditing ? 'Update book' : 'Save book'),
+              onPressed: () {
+                _saveBook();
+              },
+            ),
+            const Divider(),
+          ],
+        ),
+      ),
+    );
+  }
+}
