@@ -3,11 +3,12 @@ import 'db_helper.dart';
 import 'package:my_aplication/add_book_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const BookApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class BookApp extends StatelessWidget {
+  const BookApp({super.key});
 
   // This widget is the root of your application.
   @override
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
-      home: MyHomePage(),
+      home: const MyHomePage(),
     );
   }
 }
