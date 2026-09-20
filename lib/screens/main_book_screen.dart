@@ -55,7 +55,7 @@ class _MainBookScreenState extends State<MainBookScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Моите прочетени книги'),
+        title: const Text('Моите прочетени книги'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: _isLoading
@@ -89,8 +89,8 @@ class _MainBookScreenState extends State<MainBookScreen> {
                               builder: (context) => AddBookScreen(book: book),
                             ),
                           );
-
                           // Refresh list when returning from edit screen
+                          if (!context.mounted) return;
                           _refreshBooks();
                         },
                       ),
@@ -105,11 +105,9 @@ class _MainBookScreenState extends State<MainBookScreen> {
               },
             ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          _openAddBookScreen();
-        },
-        label: Text('Add book'),
-        icon: Icon(Icons.add),
+        onPressed: () => _openAddBookScreen(),
+        label: const Text('Add book'),
+        icon: const Icon(Icons.add),
       ),
     );
   }
