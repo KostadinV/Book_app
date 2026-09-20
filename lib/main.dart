@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:my_aplication/screens/main_book_screen.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
   runApp(const BookApp());
 }
 
