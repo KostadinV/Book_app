@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:my_aplication/database/db_helper.dart';
-import 'package:my_aplication/screens/add_book_screen.dart';
+
+import '../database/db_helper.dart';
 import '../models/book.dart';
+import 'add_book_screen.dart';
 
 class MainBookScreen extends StatefulWidget {
   const MainBookScreen({super.key});
