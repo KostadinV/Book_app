@@ -40,6 +40,7 @@ class _MainBookScreenState extends State<MainBookScreen> {
       MaterialPageRoute(builder: (context) => const AddBookScreen()),
     );
     if (result == true) {
+      if (!context.mounted) result;
       _refreshBooks();
     }
   }
@@ -48,6 +49,7 @@ class _MainBookScreenState extends State<MainBookScreen> {
   Future<void> _deleteBook(int id) async {
     // 1. Изтриваме книгата от базата данни
     await DatabaseHelper.instance.deleteBook(id);
+    if (!mounted) return;
     // 3. Опресняваме списъка на екрана
     _refreshBooks();
   }
@@ -85,7 +87,7 @@ class _MainBookScreenState extends State<MainBookScreen> {
               },
             ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _openAddBookScreen(),
+        onPressed: _openAddBookScreen,
         label: const Text('Add book'),
         icon: const Icon(Icons.add),
       ),
