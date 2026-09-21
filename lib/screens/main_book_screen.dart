@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../database/db_helper.dart';
 import '../models/book.dart';
+import '../widgets/book_list_style_widget.dart';
 import 'add_book_screen.dart';
 
 class MainBookScreen extends StatefulWidget {
@@ -66,41 +67,20 @@ class _MainBookScreenState extends State<MainBookScreen> {
               itemCount: _books.length,
               itemBuilder: (context, index) {
                 final book = _books[index];
-                return ListTile(
-                  title: Text(book.title),
-                  subtitle: Text('By ${book.author}'),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '${book.rating} ★',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange,
-                        ),
+                return BookListTile(
+                  book: book,
+                  onEdit: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AddBookScreen(book: book),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.blue),
-                        onPressed: () async {
-                          // Pass the selected book into AddBookScreen
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AddBookScreen(book: book),
-                            ),
-                          );
-                          // Refresh list when returning from edit screen
-                          if (!context.mounted) return;
-                          _refreshBooks();
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => _deleteBook(book.id!),
-                      ),
-                    ],
-                  ),
+                    );
+
+                    if (!context.mounted) return;
+                    _refreshBooks();
+                  },
+                  onDelete: () => _deleteBook(book.id!),
                 );
               },
             ),
