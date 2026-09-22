@@ -13,9 +13,10 @@ class BookListTile extends StatelessWidget {
     required this.onEdit,
     required this.onDelete,
   });
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Card(
       elevation: 1,
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -37,6 +38,11 @@ class BookListTile extends StatelessWidget {
             ),
             const SizedBox(width: 4),
             PopupMenuButton<String>(
+              // Заоблени ъгли и сянка по M3 стандарт
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 3,
               onSelected: (value) {
                 if (value == 'edit') {
                   onEdit();
@@ -45,23 +51,34 @@ class BookListTile extends StatelessWidget {
                 }
               },
               itemBuilder: (context) => [
-                const PopupMenuItem(
+                PopupMenuItem<String>(
                   value: 'edit',
                   child: Row(
                     children: [
-                      Icon(Icons.edit, size: 20),
-                      SizedBox(width: 8),
-                      Text('Редактирай'),
+                      Icon(
+                        Icons.edit_outlined,
+                        size: 20,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 12),
+                      const Text('Редактирай'),
                     ],
                   ),
                 ),
-                PopupMenuItem(
+                PopupMenuItem<String>(
                   value: 'delete',
                   child: Row(
                     children: [
-                      Icon(Icons.delete, color: Colors.red, size: 20),
-                      const SizedBox(width: 8),
-                      const Text('Изтрий', style: TextStyle(color: Colors.red)),
+                      Icon(
+                        Icons.delete_outline,
+                        size: 20,
+                        color: colorScheme.error,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Изтрий',
+                        style: TextStyle(color: colorScheme.error),
+                      ),
                     ],
                   ),
                 ),
