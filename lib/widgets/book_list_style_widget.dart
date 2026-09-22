@@ -65,6 +65,7 @@ class BookListTile extends StatelessWidget {
                     ],
                   ),
                 ),
+                PopupMenuDivider(indent: 10.0, endIndent: 10.0),
                 PopupMenuItem<String>(
                   value: 'delete',
                   child: Row(
