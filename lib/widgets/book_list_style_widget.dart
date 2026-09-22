@@ -53,6 +53,7 @@ class BookListTile extends StatelessWidget {
               itemBuilder: (context) => [
                 PopupMenuItem<String>(
                   value: 'edit',
+                  height: 48.0,
                   child: Row(
                     children: [
                       Icon(
@@ -60,7 +61,7 @@ class BookListTile extends StatelessWidget {
                         size: 20,
                         color: colorScheme.onSurfaceVariant,
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 8),
                       const Text('Редактирай'),
                     ],
                   ),
@@ -71,11 +72,11 @@ class BookListTile extends StatelessWidget {
                   child: Row(
                     children: [
                       Icon(
-                        Icons.delete_outline,
+                        Icons.delete_outline_rounded,
                         size: 20,
                         color: colorScheme.error,
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 8),
                       Text(
                         'Изтрий',
                         style: TextStyle(color: colorScheme.error),
