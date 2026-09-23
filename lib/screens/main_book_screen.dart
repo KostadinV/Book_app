@@ -22,38 +22,6 @@ class _MainBookScreenState extends State<MainBookScreen> {
     _refreshBooks();
   }
 
-  // 2. Извличаме книгите от базата данни като List<Book>
-  Future<void> _refreshBooks() async {
-    setState(() => _isLoading = true);
-    final data = await DatabaseHelper.instance.getBooks();
-    setState(() {
-      _books = data;
-      _isLoading = false;
-    });
-  }
-
-  // Open AddBookScreen, and refresh the list when user returns
-  void _openAddBookScreen() async {
-    // 1. Wait for user to finish on AddBookScreen
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const AddBookScreen()),
-    );
-    if (result == true) {
-      if (!context.mounted) result;
-      _refreshBooks();
-    }
-  }
-
-  // Метод за изтриване на книга директно от списъка
-  Future<void> _deleteBook(int id) async {
-    // 1. Изтриваме книгата от базата данни
-    await DatabaseHelper.instance.deleteBook(id);
-    if (!mounted) return;
-    // 3. Опресняваме списъка на екрана
-    _refreshBooks();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,5 +60,31 @@ class _MainBookScreenState extends State<MainBookScreen> {
         icon: const Icon(Icons.add),
       ),
     );
+  }
+
+  Future<void> _refreshBooks() async {
+    setState(() => _isLoading = true);
+    final data = await DatabaseHelper.instance.getBooks();
+    setState(() {
+      _books = data;
+      _isLoading = false;
+    });
+  }
+
+  void _openAddBookScreen() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const AddBookScreen()),
+    );
+    if (result == true) {
+      if (!context.mounted) return;
+      _refreshBooks();
+    }
+  }
+
+  Future<void> _deleteBook(int id) async {
+    await DatabaseHelper.instance.deleteBook(id);
+    if (!mounted) return;
+    _refreshBooks();
   }
 }
