@@ -83,8 +83,27 @@ class _MainBookScreenState extends State<MainBookScreen> {
   }
 
   Future<void> _deleteBook(int id) async {
-    await DatabaseHelper.instance.deleteBook(id);
-    if (!mounted) return;
-    _refreshBooks();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Изтриване на книга'),
+        content: const Text('Наистина ли искате да изтриете тази книга?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Отказ'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Изтрий', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      await DatabaseHelper.instance.deleteBook(id);
+      if (!mounted) return;
+      _refreshBooks();
+    }
   }
 }
