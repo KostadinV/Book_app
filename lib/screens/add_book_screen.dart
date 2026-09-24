@@ -38,35 +38,6 @@ class _AddBookScreenState extends State<AddBookScreen> {
     super.dispose();
   }
 
-  // Save book function triggered on button press
-  void _saveBook() async {
-    String enteredTitle = _titleController.text;
-    String enteredAuthor = _authorController.text;
-
-    if (enteredTitle.isEmpty || enteredAuthor.isEmpty) return;
-
-    if (widget.book == null) {
-      final newBook = Book(
-        title: enteredTitle,
-        author: enteredAuthor,
-        rating: _rating,
-      );
-      await DatabaseHelper.instance.insertBook(newBook);
-    } else {
-      // 2. Store values directly into SQLite database
-      final updateBook = Book(
-        id: widget.book!.id,
-        title: enteredTitle,
-        author: enteredAuthor,
-        rating: _rating,
-      );
-      await DatabaseHelper.instance.updateBook(updateBook);
-    }
-    if (mounted) {
-      Navigator.pop(context, true);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.book != null;
@@ -129,5 +100,31 @@ class _AddBookScreenState extends State<AddBookScreen> {
         ),
       ),
     );
+  }
+
+  void _saveBook() async {
+    String enteredTitle = _titleController.text;
+    String enteredAuthor = _authorController.text;
+
+    if (enteredTitle.isEmpty || enteredAuthor.isEmpty) return;
+
+    if (widget.book == null) {
+      final newBook = Book(
+        title: enteredTitle,
+        author: enteredAuthor,
+        rating: _rating,
+      );
+      await DatabaseHelper.instance.insertBook(newBook);
+    } else {
+      final updateBook = Book(
+        id: widget.book!.id,
+        title: enteredTitle,
+        author: enteredAuthor,
+        rating: _rating,
+      );
+      await DatabaseHelper.instance.updateBook(updateBook);
+    }
+    if (!mounted) return;
+    Navigator.pop(context, true);
   }
 }
