@@ -50,7 +50,6 @@ class _AddBookScreenState extends State<AddBookScreen> {
         actionsIconTheme: IconThemeData(
           color: Theme.of(context).colorScheme.primary,
         ),
-        actions: [IconButton(onPressed: _saveBook, icon: Icon(Icons.save))],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
