@@ -14,6 +14,8 @@ class AddBookScreen extends StatefulWidget {
 }
 
 class _AddBookScreenState extends State<AddBookScreen> {
+  final _formKey = GlobalKey<FormState>();
+
   final _titleController = TextEditingController();
 
   final _authorController = TextEditingController();
@@ -52,57 +54,75 @@ class _AddBookScreenState extends State<AddBookScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              controller: _titleController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Book title',
-              ),
-              onTapOutside: (event) {
-                FocusManager.instance.primaryFocus?.unfocus();
-              },
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: _authorController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Book Author',
-              ),
-              onTapOutside: (event) {
-                FocusManager.instance.primaryFocus?.unfocus();
-              },
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                StarRatingBar(
-                  onRatingChanged: (newRating) {
-                    setState(() {
-                      _rating = newRating;
-                    });
-                  },
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextFormField(
+                controller: _titleController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Book title',
                 ),
-              ],
-            ),
-            ElevatedButton(
-              child: Text(isEditing ? 'Update book' : 'Save book'),
-              onPressed: () {
-                _saveBook();
-              },
-            ),
-            const Divider(),
-          ],
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Моля, въведете заглавие на книгата';
+                  }
+                  return null;
+                },
+                onTapOutside: (event) {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                },
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _authorController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Book Author',
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Моля, въведете автор на книгата';
+                  }
+                  return null;
+                },
+                onTapOutside: (event) {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                },
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  StarRatingBar(
+                    onRatingChanged: (newRating) {
+                      setState(() {
+                        _rating = newRating;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              ElevatedButton(
+                child: Text(isEditing ? 'Update book' : 'Save book'),
+                onPressed: () {
+                  _saveBook();
+                },
+              ),
+              const Divider(),
+            ],
+          ),
         ),
       ),
     );
   }
 
   void _saveBook() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
     String enteredTitle = _titleController.text;
     String enteredAuthor = _authorController.text;
 
