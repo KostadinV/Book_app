@@ -29,31 +29,19 @@ class _MainBookScreenState extends State<MainBookScreen> {
         title: const Text('Моите прочетени книги'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _books.isEmpty
-          ? const Center(child: Text('No books saved in database yet.'))
-          : ListView.builder(
-              itemCount: _books.length,
-              itemBuilder: (context, index) {
-                final book = _books[index];
-                return BookListTile(
-                  book: book,
-                  onEdit: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AddBookScreen(book: book),
-                      ),
-                    );
-
-                    if (!context.mounted) return;
-                    _refreshBooks();
-                  },
-                  onDelete: () => _deleteBook(book.id!),
-                );
-              },
-            ),
+      body: _BookListBody(
+        isLoading: _isLoading,
+        books: _books,
+        onEdit: (book) async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddBookScreen(book: book)),
+          );
+          if (!mounted) return;
+          _refreshBooks();
+        },
+        onDelete: (id) => _deleteBook(id),
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _openAddBookScreen,
         label: const Text('Add book'),
@@ -105,5 +93,42 @@ class _MainBookScreenState extends State<MainBookScreen> {
       if (!mounted) return;
       _refreshBooks();
     }
+  }
+}
+
+class _BookListBody extends StatelessWidget {
+  final bool isLoading;
+  final List<Book> books;
+  final ValueChanged<Book> onEdit;
+  final ValueChanged<int> onDelete;
+
+  const _BookListBody({
+    required this.isLoading,
+    required this.books,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (books.isEmpty) {
+      return const Center(child: Text('No books saved in database yet.'));
+    }
+
+    return ListView.builder(
+      itemCount: books.length,
+      itemBuilder: (context, index) {
+        final book = books[index];
+        return BookListTile(
+          book: book,
+          onEdit: () => onEdit(book),
+          onDelete: () => onDelete(book.id!),
+        );
+      },
+    );
   }
 }
