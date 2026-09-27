@@ -75,8 +75,13 @@ class _AddBookScreenState extends State<AddBookScreen> {
                   setState(() => _rating = newRating);
                 },
               ),
-              _BookSubmitButton(isEditing: isEditing, onPressed: _saveBook),
-              const Divider(),
+              SizedBox(
+                width: double.infinity,
+                child: _BookSubmitButton(
+                  isEditing: isEditing,
+                  onPressed: _saveBook,
+                ),
+              ),
             ],
           ),
         ),
