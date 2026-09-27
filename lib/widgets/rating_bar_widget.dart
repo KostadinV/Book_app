@@ -2,16 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class StarRatingBar extends StatefulWidget {
+  final double initialRating;
   final ValueChanged<double> onRatingChanged;
 
-  const StarRatingBar({super.key, required this.onRatingChanged});
+  const StarRatingBar({
+    super.key,
+    this.initialRating = 3.0,
+    required this.onRatingChanged,
+  });
 
   @override
   State<StarRatingBar> createState() => _StarRatingBarState();
 }
 
 class _StarRatingBarState extends State<StarRatingBar> {
-  double _rating = 3.0;
+  late double _rating;
+  @override
+  void initState() {
+    super.initState();
+    _rating = widget.initialRating;
+  }
+
   @override
   Widget build(BuildContext context) {
     return RatingBar.builder(

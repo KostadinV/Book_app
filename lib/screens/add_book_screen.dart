@@ -71,6 +71,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
               ),
               const SizedBox(height: 10),
               _BookRatingSection(
+                rating: _rating,
                 onRatingChanged: (newRating) {
                   setState(() => _rating = newRating);
                 },
@@ -150,15 +151,21 @@ class _BookTextField extends StatelessWidget {
 }
 
 class _BookRatingSection extends StatelessWidget {
+  final double rating;
   final ValueChanged<double> onRatingChanged;
 
-  const _BookRatingSection({required this.onRatingChanged});
+  const _BookRatingSection({
+    required this.rating,
+    required this.onRatingChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: [StarRatingBar(onRatingChanged: onRatingChanged)],
+      children: [
+        StarRatingBar(initialRating: rating, onRatingChanged: onRatingChanged),
+      ],
     );
   }
 }
