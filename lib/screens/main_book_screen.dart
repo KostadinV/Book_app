@@ -14,7 +14,12 @@ class MainBookScreen extends StatefulWidget {
 
 class _MainBookScreenState extends State<MainBookScreen> {
   List<Book> _books = [];
+  List<Book> _filteredBooks = [];
+
   bool _isLoading = true;
+  bool _isSearching = false;
+
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -23,15 +28,51 @@ class _MainBookScreenState extends State<MainBookScreen> {
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Моите прочетени книги'),
+        title: _isSearching
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  hintText: 'Search title or author...',
+                  hintStyle: TextStyle(color: Colors.white70),
+                  border: InputBorder.none,
+                ),
+                onChanged: _filterBooks,
+              )
+            : const Text('Моите прочетени книги'),
+        actions: [
+          if (_isSearching)
+            IconButton(
+              icon: const Icon(Icons.clear),
+              onPressed: _stopSearching,
+              tooltip: 'Clear Search',
+            )
+          else
+            IconButton(
+              icon: const Icon(Icons.search),
+              onPressed: () {
+                setState(() {
+                  _isSearching = true;
+                });
+              },
+              tooltip: 'Search Books',
+            ),
+        ],
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: _BookListBody(
         isLoading: _isLoading,
-        books: _books,
+        books: _filteredBooks,
         onEdit: (book) async {
           await Navigator.push(
             context,
@@ -55,7 +96,35 @@ class _MainBookScreenState extends State<MainBookScreen> {
     final data = await DatabaseHelper.instance.getBooks();
     setState(() {
       _books = data;
+      if (_isSearching && _searchController.text.isNotEmpty) {
+        _filterBooks(_searchController.text);
+      } else {
+        _filteredBooks = data;
+      }
       _isLoading = false;
+    });
+  }
+
+  void _filterBooks(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredBooks = _books;
+      } else {
+        final searchLower = query.toLowerCase();
+        _filteredBooks = _books.where((book) {
+          final titleMatch = book.title.toLowerCase().contains(searchLower);
+          final authorMatch = book.author.toLowerCase().contains(searchLower);
+          return titleMatch || authorMatch;
+        }).toList();
+      }
+    });
+  }
+
+  void _stopSearching() {
+    _searchController.clear();
+    setState(() {
+      _isSearching = false;
+      _filteredBooks = _books;
     });
   }
 
