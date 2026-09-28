@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_aplication/widgets/book_search_bar.dart';
 
 import '../database/db_helper.dart';
 import '../models/book.dart';
@@ -38,26 +39,14 @@ class _MainBookScreenState extends State<MainBookScreen> {
     return Scaffold(
       appBar: AppBar(
         title: _isSearching
-            ? TextField(
+            ? BookSearchBar(
                 controller: _searchController,
-                autofocus: true,
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
-                  hintText: 'Search title or author...',
-                  hintStyle: TextStyle(color: Colors.white70),
-                  border: InputBorder.none,
-                ),
                 onChanged: _filterBooks,
+                onClear: _stopSearching,
               )
             : const Text('Моите прочетени книги'),
         actions: [
-          if (_isSearching)
-            IconButton(
-              icon: const Icon(Icons.clear),
-              onPressed: _stopSearching,
-              tooltip: 'Clear Search',
-            )
-          else
+          if (!_isSearching)
             IconButton(
               icon: const Icon(Icons.search),
               onPressed: () {
@@ -65,7 +54,7 @@ class _MainBookScreenState extends State<MainBookScreen> {
                   _isSearching = true;
                 });
               },
-              tooltip: 'Search Books',
+              tooltip: 'Search',
             ),
         ],
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
