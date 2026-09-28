@@ -178,7 +178,7 @@ class _BookSubmitButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
+    return FilledButton(
       onPressed: onPressed,
       child: Text(isEditing ? 'Update book' : 'Save book'),
     );
