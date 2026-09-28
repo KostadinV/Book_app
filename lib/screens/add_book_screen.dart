@@ -100,6 +100,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
     if (enteredTitle.isEmpty || enteredAuthor.isEmpty) return;
 
     if (widget.book == null) {
+      // 1. Нова книга (isFavorite си става false по подразбиране)
       final newBook = Book(
         title: enteredTitle,
         author: enteredAuthor,
@@ -107,14 +108,16 @@ class _AddBookScreenState extends State<AddBookScreen> {
       );
       await DatabaseHelper.instance.insertBook(newBook);
     } else {
-      final updateBook = Book(
-        id: widget.book!.id,
+      // 2. Редактиране на съществуваща книга
+      // Използваме copyWith, за да запазим същото id и стойността на isFavorite!
+      final updatedBook = widget.book!.copyWith(
         title: enteredTitle,
         author: enteredAuthor,
         rating: _rating,
       );
-      await DatabaseHelper.instance.updateBook(updateBook);
+      await DatabaseHelper.instance.updateBook(updatedBook);
     }
+
     if (!mounted) return;
     Navigator.pop(context, true);
   }

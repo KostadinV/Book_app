@@ -62,6 +62,7 @@ class _MainBookScreenState extends State<MainBookScreen> {
       body: _BookListBody(
         isLoading: _isLoading,
         books: _filteredBooks,
+        onToggleFavorite: _toggleFavorite,
         onEdit: (book) async {
           await Navigator.push(
             context,
@@ -152,17 +153,27 @@ class _MainBookScreenState extends State<MainBookScreen> {
       _refreshBooks();
     }
   }
+
+  Future<void> _toggleFavorite(Book book) async {
+    final updatedBook = book.copyWith(isFavorite: !book.isFavorite);
+
+    await DatabaseHelper.instance.updateBook(updatedBook);
+
+    _refreshBooks();
+  }
 }
 
 class _BookListBody extends StatelessWidget {
   final bool isLoading;
   final List<Book> books;
+  final Function(Book) onToggleFavorite;
   final ValueChanged<Book> onEdit;
   final ValueChanged<int> onDelete;
 
   const _BookListBody({
     required this.isLoading,
     required this.books,
+    required this.onToggleFavorite,
     required this.onEdit,
     required this.onDelete,
   });
@@ -183,6 +194,7 @@ class _BookListBody extends StatelessWidget {
         final book = books[index];
         return BookListTile(
           book: book,
+          onToggleFavorite: () => onToggleFavorite(book),
           onEdit: () => onEdit(book),
           onDelete: () => onDelete(book.id!),
         );

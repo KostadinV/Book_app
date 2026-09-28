@@ -12,7 +12,7 @@ class DatabaseHelper {
   // 1. Get database instance (or open it if it doesn't exist yet)
   Future<Database> get database async {
     if (_db != null) return _db!;
-    _db = await _initDatabase('books.db');
+    _db = await _initDatabase('books_v2.db');
     return _db!;
   }
 
@@ -20,7 +20,21 @@ class DatabaseHelper {
     String dbPath = await getDatabasesPath();
     String path = join(dbPath, filePath);
 
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    return await openDatabase(
+      path,
+      version: 3,
+      onCreate: _createDB,
+      onUpgrade: _onUpgrade, // <-- ДОБАВИ ТОЗИ РЕД ТУК
+    );
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // Добавяме новата колона към съществуващата таблица
+      await db.execute(
+        'ALTER TABLE books ADD COLUMN is_favorite INTEGER DEFAULT 0;',
+      );
+    }
   }
 
   Future<void> _createDB(Database db, int version) async {
@@ -29,7 +43,8 @@ class DatabaseHelper {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL,
         author TEXT NOT NULL,
-        rating REAL NOT NULL
+        rating REAL NOT NULL,
+        is_favorite INTEGER DEFAULT 0
       )
     ''');
   }

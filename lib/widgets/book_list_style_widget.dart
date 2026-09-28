@@ -8,13 +8,16 @@ class BookListTile extends StatelessWidget {
   final Book book;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final VoidCallback onToggleFavorite;
 
   const BookListTile({
     super.key,
     required this.book,
     required this.onEdit,
     required this.onDelete,
+    required this.onToggleFavorite,
   });
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -32,6 +35,16 @@ class BookListTile extends StatelessWidget {
             RatingBadge(rating: book.rating),
             const SizedBox(width: 4),
             BookActionMenu(onEdit: onEdit, onDelete: onDelete),
+            IconButton(
+              icon: Icon(
+                book.isFavorite ? Icons.favorite : Icons.favorite_border,
+                color: book.isFavorite ? Colors.red : null,
+              ),
+              tooltip: book.isFavorite
+                  ? 'Премахни от любими'
+                  : 'Добави в любими',
+              onPressed: onToggleFavorite,
+            ),
           ],
         ),
       ),
