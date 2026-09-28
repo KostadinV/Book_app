@@ -28,7 +28,7 @@ class BookListTile extends StatelessWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildRatingBadge(),
+            RatingBadge(rating: book.rating),
             const SizedBox(width: 4),
             BookActionMenu(onEdit: onEdit, onDelete: onDelete),
           ],
@@ -36,11 +36,16 @@ class BookListTile extends StatelessWidget {
       ),
     );
   }
+}
 
-  // Помощен метод за визуалното показване на рейтинга
-  Widget _buildRatingBadge() {
+class RatingBadge extends StatelessWidget {
+  final double rating;
+  const RatingBadge({super.key, required this.rating});
+
+  @override
+  Widget build(BuildContext context) {
     return Text(
-      '${book.rating} ★',
+      '$rating *',
       style: TextStyle(
         fontWeight: FontWeight.bold,
         color: Colors.amber.shade700,
