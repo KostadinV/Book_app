@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../database/db_helper.dart';
 import '../models/book.dart';
-import '../widgets/rating_bar_widget.dart';
+import '../widgets/rating_bar.dart';
 
 class AddBookScreen extends StatefulWidget {
   final Book? book;
