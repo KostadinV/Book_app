@@ -39,10 +39,10 @@ class BookSearchBar extends StatelessWidget {
           prefixIcon: Icon(
             Icons.search,
             color: theme.colorScheme.onSurfaceVariant,
-            size: 20,
+            size: 24,
           ),
           suffixIcon: IconButton(
-            icon: const Icon(Icons.close, size: 20),
+            icon: const Icon(Icons.close),
             color: theme.colorScheme.onSurfaceVariant,
             onPressed: onClear,
             tooltip: 'Clear Search',

@@ -25,7 +25,7 @@ class BookListTile extends StatelessWidget {
           book.title,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        subtitle: Text('By ${book.author}'),
+        subtitle: Text(book.author),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
